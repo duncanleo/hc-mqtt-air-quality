@@ -94,6 +94,7 @@ func main() {
 				pm10Val.UpdateValue(pm10)
 				pm25 = data.Atmospheric.PM25
 				pm25Val.UpdateValue(pm25)
+				aqSensor.AirQuality.UpdateValue(getRating(pm25))
 				break
 			}
 		}
