@@ -6,6 +6,8 @@ github.com/brutella/hc v1.2.0 h1:IiYlopCLINYPKX8pa9uR/Lsf6mTmJOOAxAkVd1NViNQ=
 github.com/brutella/hc v1.2.0/go.mod h1:+2Oh6uBFo8fFD6YxUWbYc68MGtLCoMYzZS7I9r0yq+E=
 github.com/duncanleo/go-plantower v0.1.1 h1:QEwUZVMMfG/eVsKYzZKVIOd8pn0Sr4bO3G16TmFQUeI=
 github.com/duncanleo/go-plantower v0.1.1/go.mod h1:1rwQQLt74RB8uEKKQ7YQlTxuKWsL8+4BtacD7ng14Wc=
+github.com/duncanleo/go-plantower v0.1.2 h1:q/X0jQyNSYqPyg4ki9wdofw5TrHnMEiSJSxda9SBQs8=
+github.com/duncanleo/go-plantower v0.1.2/go.mod h1:t2ud0X37yXeS3TYTvgd2oRXVJz9SnrU56a57wLF9doE=
 github.com/gosexy/to v0.0.0-20141221203644-c20e083e3123 h1:6Q7VB4v0aEgIE6BtsbJhEH0KgFE0f+FHAxXePQp9Klc=
 github.com/gosexy/to v0.0.0-20141221203644-c20e083e3123/go.mod h1:oQuuq9ZkoRpy+2mhINlY3ZrwgywR77yPXmFpP6vCr/w=
 github.com/miekg/dns v1.1.1/go.mod h1:W1PPwlIAgtquWBMBEV9nkV9Cazfe8ScdGz/Lj7v3Nrg=
@@ -25,3 +27,4 @@ golang.org/x/sys v0.0.0-20181206074257-70b957f3b65e/go.mod h1:STP8DvDyc/dI5b8T5h
 golang.org/x/sys v0.0.0-20190130150945-aca44879d564/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
 golang.org/x/sys v0.0.0-20190412213103-97732733099d h1:+R4KGOnez64A81RvjARKc4UT5/tI9ujCIVX+P5KiHuI=
 golang.org/x/sys v0.0.0-20190412213103-97732733099d/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+golang.org/x/sys v0.0.0-20191224085550-c709ea063b76/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
