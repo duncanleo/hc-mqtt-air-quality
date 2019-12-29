@@ -40,14 +40,14 @@ func connect(clientID string, uri *url.URL) (mqtt.Client, error) {
 func main() {
 	var port = flag.String("port", "", "port for HC")
 	var pin = flag.String("pin", "00102003", "pairing PIN for the accessory")
-	var storagePath = flag.String("storagePath", "hc-plantower-storage", "storage path")
+	var storagePath = flag.String("storagePath", "hc-mqtt-air-quality-storage", "storage path")
 
 	var name = flag.String("name", "PMS5003", "name for the accessory")
 	var manufacturer = flag.String("manufacturer", "Plantower", "manufacturer for the accessory")
 	var model = flag.String("model", "pms5003", "model for the accessory")
 
 	var brokerURI = flag.String("brokerURI", "mqtt://127.0.0.1:1883", "URI of the MQTT broker")
-	var clientID = flag.String("clientID", "hc-mqtt-temperature", "client ID for MQTT")
+	var clientID = flag.String("clientID", "hc-mqtt-air-quality", "client ID for MQTT")
 
 	var topic = flag.String("topic", "air", "topic to subscribe to in MQTT")
 	var pm25JSONPath = flag.String("pm2.5JSONPath", "pm2\\.5", "JSON path to pm2.5 data")

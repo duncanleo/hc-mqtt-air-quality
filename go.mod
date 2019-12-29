@@ -1,4 +1,4 @@
-module github.com/duncanleo/hc-plantower
+module github.com/duncanleo/hc-mqtt-air-quality
 
 go 1.13
 
