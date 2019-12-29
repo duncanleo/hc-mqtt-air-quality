@@ -2,21 +2,40 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
+	"net/url"
 	"time"
 
 	"github.com/brutella/hc"
 	"github.com/brutella/hc/accessory"
 	"github.com/brutella/hc/characteristic"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/tidwall/gjson"
+
 	"github.com/brutella/hc/service"
-	"github.com/duncanleo/go-plantower/devices"
 )
 
 var (
-	pm10 = -1
-	pm25 = -1
-	done = make(chan bool)
+	pm10 int64 = -1
+	pm25 int64 = -1
+	done       = make(chan bool)
 )
+
+func connect(clientID string, uri *url.URL) (mqtt.Client, error) {
+	var opts = mqtt.NewClientOptions()
+	opts.AddBroker(fmt.Sprintf("tcp://%s", uri.Host))
+	opts.SetUsername(uri.User.Username())
+	password, _ := uri.User.Password()
+	opts.SetPassword(password)
+	opts.SetClientID(clientID)
+
+	var client = mqtt.NewClient(opts)
+	var token = client.Connect()
+	for !token.WaitTimeout(3 * time.Second) {
+	}
+	return client, token.Error()
+}
 
 func main() {
 	var port = flag.String("port", "", "port for HC")
@@ -27,13 +46,24 @@ func main() {
 	var manufacturer = flag.String("manufacturer", "Plantower", "manufacturer for the accessory")
 	var model = flag.String("model", "pms5003", "model for the accessory")
 
-	var serialDevice = flag.String("device", "/dev/ttyAMA0", "name of the serial device. e.g. COM1 on Windows, /dev/ttyAMA0 on Linux")
-	var waitTime = flag.Int("wait", 2, "time to wait before getting reading from sensor device")
-	var fetchInterval = flag.Int("fetchInterval", 120, "time interval between fetching data (in seconds)")
+	var brokerURI = flag.String("brokerURI", "mqtt://127.0.0.1:1883", "URI of the MQTT broker")
+	var clientID = flag.String("clientID", "hc-mqtt-temperature", "client ID for MQTT")
+
+	var topic = flag.String("topic", "air", "topic to subscribe to in MQTT")
+	var pm25JSONPath = flag.String("pm2.5JSONPath", "pm2\\.5", "JSON path to pm2.5 data")
+	var pm10JSONPath = flag.String("pm10JSONPath", "pm10", "JSON path to pm10 data")
 
 	flag.Parse()
 
-	var ticker = time.NewTicker(time.Duration(*fetchInterval) * time.Second)
+	mqttURI, err := url.Parse(*brokerURI)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	mqttClient, err := connect(*clientID, mqttURI)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	hcConfig := hc.Config{
 		Pin:         *pin,
@@ -75,31 +105,14 @@ func main() {
 	statusFault.SetValue(characteristic.StatusFaultNoFault)
 	aqSensor.AddCharacteristic(statusFault.Characteristic)
 
-	go func() {
-		for {
-			select {
-			case <-done:
-				return
-			case <-ticker.C:
-				data, err := devices.DeviceFuncs[*model](*serialDevice, map[string]interface{}{
-					"waitTime": *waitTime,
-				})
-				if err != nil {
-					log.Println(err)
-					statusFault.UpdateValue(characteristic.StatusFaultGeneralFault)
-					continue
-				}
-				statusFault.UpdateValue(characteristic.StatusFaultNoFault)
-				pm10 = data.Atmospheric.PM10
-				pm10Val.UpdateValue(pm10)
-				pm25 = data.Atmospheric.PM25
-				pm25Val.UpdateValue(pm25)
-				aqSensor.AirQuality.UpdateValue(getRating(pm25))
-				break
-			}
-		}
+	mqttClient.Subscribe(*topic, 0, func(client mqtt.Client, msg mqtt.Message) {
+		pm25 = gjson.Get(string(msg.Payload()), *pm25JSONPath).Int()
+		pm10 = gjson.Get(string(msg.Payload()), *pm10JSONPath).Int()
 
-	}()
+		pm25Val.UpdateValue(pm25)
+		pm10Val.UpdateValue(pm10)
+		aqSensor.AirQuality.UpdateValue(getRating(pm25))
+	})
 
 	acc.AddService(aqSensor.Service)
 
@@ -116,7 +129,7 @@ func main() {
 	t.Start()
 }
 
-func getRating(pm25 int) int {
+func getRating(pm25 int64) int {
 	if pm25 >= 201 {
 		return characteristic.AirQualityPoor
 	} else if pm25 >= 151 {
